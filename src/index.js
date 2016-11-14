@@ -24,6 +24,7 @@ module.exports = function(source, sourcemap) {
     var genDir = query.genDir || '';
     var srcDir = query.srcDir || '';
     var inline = query.inline || true;
+    var restrictSync = query.restrictSync || false;
     var debug = this.debug || query.debug;
 
     // get the filename path
@@ -43,7 +44,7 @@ module.exports = function(source, sourcemap) {
         var queryIndex = loadString.lastIndexOf('?');
         var hasQuery = queryIndex !== -1;
         var loadStringQuery = hasQuery ? loaderUtils.parseQuery(loadString.substr(queryIndex)) : {};
-        var sync = !!loadStringQuery.sync;
+        var sync = restrictSync || !!loadStringQuery.sync;
 
         // Resolution type
         var resolution = extractResolution(loadStringQuery);

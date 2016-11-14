@@ -114,6 +114,22 @@ describe('Loader', function() {
         checkResult(loadedString, result);
     });
 
+    it('[restrictSync] should return a loadChildren sync require statement', function() {
+        var result = [
+            'loadChildren: function() {',
+            '  return require(\'./path/to/file.module\')[\'FileModule\'];',
+            '}'
+        ];
+
+
+        var loadedString = loader.call({
+            resourcePath: resourcePath,
+            query: query + '&restrictSync=true'
+        }, `loadChildren: '${modulePath}'`);
+
+        checkResult(loadedString, result);
+    });
+
     it('should return a loadChildren System.import statement', function() {
         var result = [
             'loadChildren: () => System.import(\'./path/to/file.module\')',

@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+
+var glob = require('glob'),
+    chalk = require('chalk'),
+    fs = require('fs'),
+    path = require('path'),
+    program = require('commander'),
+    Query = require('../lib/Query'),
+    pkg = require('../package.json'),
+    replacer = require('../src/index'),
+    files;
+
+program
+    .version(pkg.version)
+    .arguments('[files]')
+    .action(function (_files) {
+        files = _files;
+    })
+    .option('--gen-dir <folder>', 'Angular compiler generated sources folder')
+    .option('--src-dir <folder>', 'Source root')
+    .option('--async', 'Allow async modules')
+    .option('-v, --verbose ', 'Verbose mode')
+    .option('-A, --aot', 'Enable AOT Angular compiler mode')
+    .parse(process.argv);
+
+files = glob.sync(files || '!(node_modules)/**/*');
+
+program.verbose && console.log("Searching url replacements in:");
+program.verbose && files.forEach(function (file) {
+    console.log("  -- ", file);
+});
+
+
+files.forEach(function (file) {
+    var filePath = path.resolve(file);
+
+    replacer.call(
+        {
+            resourcePath: filePath,
+            query: '?' + new Query({
+                restrictSync: !program.async,
+                aot: program.aot,
+                genDir: program.genDir,
+                srcDir: program.srcDir
+            }).toString(),
+            callback: function (err, source) {
+                if (err) {
+                    console.error(err);
+                    process.exit(1);
+                }
+
+                fs.writeFileSync(filePath, source, {encoding: 'utf-8'})
+            }
+        },
+        fs.readFileSync(file, {encoding: 'utf-8'})
+    );
+});
+
+
+
