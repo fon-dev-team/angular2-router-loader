@@ -39,7 +39,7 @@ files.forEach(function (file) {
             resourcePath: filePath,
             query: '?' + new Query({
                 restrictSync: !program.async,
-                aot: program.aot,
+                aot: !!program.aot,
                 genDir: program.genDir,
                 srcDir: program.srcDir
             }).toString(),
